@@ -1,7 +1,7 @@
 {
   "name": "neighbor-loader",
   "description": "Automatically requires specified neighbors",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "repository": "vonagam/neighbor-loader",
   "author": "Dmitry Maganov <vonagam@gmail.com>",
   "license": "MIT",
