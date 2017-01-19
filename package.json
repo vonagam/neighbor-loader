@@ -1,0 +1,17 @@
+{
+  "name": "neighbor-loader",
+  "description": "Automatically requires specified neighbors",
+  "version": "0.0.2",
+  "repository": "vonagam/neighbor-loader",
+  "author": "Dmitry Maganov <vonagam@gmail.com>",
+  "license": "MIT",
+  "keywords": [
+    "webpack",
+    "loader"
+  ],
+  "main": "index.js",
+  "dependencies": {
+    "loader-utils": "^0.2.16",
+    "source-map": "^0.5.6"
+  }
+}
