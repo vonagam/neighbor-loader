@@ -10,6 +10,27 @@ var SourceNode = SourceMap.SourceNode;
 var SourceMapConsumer = SourceMap.SourceMapConsumer;
 
 
+var Combine = {
+
+  withoutMap: {
+
+    top: function ( source, addition ) { return addition + source; },
+
+    bottom: function ( source, addition ) { return source + addition; },
+
+  },
+
+  withMap: {
+
+    top: function ( sourceNode, addition ) { sourceNode.prepend( addition ); },
+
+    bottom: function ( sourceNode, addition ) { sourceNode.add( addition ); },
+
+  },
+
+};
+
+
 module.exports = function ( source, map ) {
 
   var callback = this.async();
@@ -31,28 +52,29 @@ module.exports = function ( source, map ) {
     if ( error ) return callback( null, source, map );
 
 
-    var interpolatePrefix = config.interpolatePrefix || function ( prefix, path, loaderContext, result ) {
+    var interpolateRequiring = config.interpolateRequiring || function ( requiring, path, loaderContext, result ) {
 
-      return loaderUtils.interpolateName( loaderContext, prefix.replace( '[neighbor]', path ), {} );
+      return loaderUtils.interpolateName( loaderContext, requiring.replace( '[neighbor]', path ), {} );
 
     };
 
-    var prefix = interpolatePrefix( config.prefix || 'require("[neighbor]");\n\n', path, this, result );
+    var requiring = interpolateRequiring( config.requiring || 'require("[neighbor]");\n\n', path, this, result );
+
+    var position = config.position || 'top';
 
 
-    if ( ! map ) return callback( null, prefix + source );
+    if ( ! map ) return callback( null, Combine.withoutMap[ position ]( source, requiring ) );
 
 
     var currentRequest = loaderUtils.getCurrentRequest( this );
 
-    var node = SourceNode.fromStringWithSourceMap( source, new SourceMapConsumer( map ) );
+    var sourceNode = SourceNode.fromStringWithSourceMap( source, new SourceMapConsumer( map ) );
 
 
-    node.prepend( prefix );
+    Combine.withMap[ position ]( sourceNode, requiring );
 
 
-    var result = node.toStringWithSourceMap( { file: currentRequest } );
-
+    var result = sourceNode.toStringWithSourceMap( { file: currentRequest } );
 
     callback( null, result.code, result.map.toJSON() );
 
